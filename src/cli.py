@@ -13,7 +13,7 @@ from pypdf.errors import PyPdfError
 
 from .build_package import build_package
 from .extract_labels import extract_labels
-from .load_sources import discover_one, load_overrides, load_products, load_shipments, write_csv
+from .load_sources import discover_one, load_fuzzy_matches, load_overrides, load_products, load_shipments, write_csv
 from .match_records import match_records
 from .schema import ISSUE_FIELDS, LABEL_FIELDS, MATCH_FIELDS, OVERRIDE_FIELDS, PASS_STATUSES, SKIP_STATUS
 from .validate_records import source_hashes, validate_records, verify_sources
@@ -40,6 +40,7 @@ def run(args):
     shipment_path = args.shipment.resolve() if args.shipment else discover_one(batch / "input/发货单", ".csv")
     products_path = args.products.resolve() if args.products else discover_one(batch / "input/信息表", ".csv")
     override_path = (args.overrides or batch / "manual_overrides.csv").resolve()
+    fuzzy_path = (args.fuzzy_matches or batch / "fuzzy_matches.json").resolve()
     inputs = [labels_path, shipment_path, products_path]
     if override_path in inputs:
         raise ValueError("人工覆盖表不能与原始数据文件相同")
@@ -47,12 +48,17 @@ def run(args):
         raise ValueError(f"指定的人工覆盖表不存在：{override_path}")
     if override_path.exists():
         inputs.append(override_path)
+    if args.fuzzy_matches and not fuzzy_path.is_file():
+        raise ValueError(f"指定的模糊匹配 JSON 不存在：{fuzzy_path}")
+    if fuzzy_path.exists():
+        inputs.append(fuzzy_path)
     hashes = source_hashes(inputs)
     labels = extract_labels(labels_path)
     shipment_fields, shipments = load_shipments(shipment_path)
     products = load_products(products_path)
     overrides = load_overrides(override_path)
-    matches = match_records(labels, shipments, products, overrides)
+    fuzzy_matches = load_fuzzy_matches(fuzzy_path)
+    matches = match_records(labels, shipments, products, overrides, fuzzy_matches)
     issues = validate_records(labels, shipments, matches, overrides)
     pending = [row for row in matches if row["匹配状态"] not in PASS_STATUSES | {SKIP_STATUS}]
     skipped = [row for row in matches if row["匹配状态"] == SKIP_STATUS]
@@ -97,6 +103,7 @@ def run(args):
         "可分组统计": [{"材质": m, "发货尺码": s, "页数": count} for (m, s), count in sorted(groups.items())],
         "源文件SHA256": hashes, "源文件未改变": True,
         "审计目录": str(audit_path), "人工覆盖表": str(override_path), "发货包目录": None,
+        "模糊匹配档案": str(fuzzy_path) if fuzzy_path.exists() else None,
     }
     verify_sources(hashes)
     write_json(audit_path / "统计摘要.json", summary)
@@ -135,6 +142,7 @@ def parser():
         sub.add_argument("--shipment", type=Path, help="指定发货单 CSV")
         sub.add_argument("--products", type=Path, help="指定信息表 CSV")
         sub.add_argument("--overrides", type=Path, help="指定已存在的逐单人工覆盖表")
+        sub.add_argument("--fuzzy-matches", type=Path, help="指定材质等字段的模糊匹配 JSON 档案")
         sub.add_argument("--output", type=Path, help="新输出目录；audit 为审计目录，build 为正式发货包目录")
     return root
 

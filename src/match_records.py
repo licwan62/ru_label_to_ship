@@ -41,7 +41,8 @@ def override_errors(override, sku):
     return errors
 
 
-def match_records(labels, shipments, products, overrides=()):
+def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None):
+    material_aliases = (fuzzy_matches or {}).get("材质", {})
     shipment_index = index_rows(shipments, "发货号码")
     product_index = index_rows(products, "货号")
     override_index = index_rows(overrides, "完整发货号码")
@@ -82,6 +83,10 @@ def match_records(labels, shipments, products, overrides=()):
                     "无尺码备注": product.get("无尺码备注（车型/尺寸）", ""),
                     "对应依据": f"完整发货号码精确匹配发货单记录{shipment['源记录号']}；货号精确匹配信息表记录{product['源记录号']}",
                 })
+                mapped_material = material_aliases.get(row["标准材质"])
+                if mapped_material:
+                    row["标准材质"] = mapped_material
+                    row["对应依据"] += f"；模糊匹配JSON材质映射：{product['材质']}→{mapped_material}"
             elif len(products_found) > 1:
                 row["信息表记录号"] = ";".join(str(p["源记录号"]) for p in products_found)
 
@@ -101,6 +106,11 @@ def match_records(labels, shipments, products, overrides=()):
                     confirmed = not skipped
                     row["标准发货尺码"] = "" if skipped else override["确认发货尺码"]
                     row["标准材质"] = "" if skipped else override["确认材质"]
+                    mapped_material = material_aliases.get(row["标准材质"])
+                    if mapped_material:
+                        original_confirmed = row["标准材质"]
+                        row["标准材质"] = mapped_material
+                        row["对应依据"] += f"；模糊匹配JSON材质映射：{original_confirmed}→{mapped_material}"
                 row["对应依据"] += (
                     f"；manual_overrides记录{override['源记录号']}"
                     f"；确认人={override['确认人']}；确认日期={override['确认日期']}"

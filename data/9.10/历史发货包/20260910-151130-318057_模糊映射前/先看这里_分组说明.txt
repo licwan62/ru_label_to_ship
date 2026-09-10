@@ -6,11 +6,12 @@
 尾四位取完整发货号码第一段的后四位，仅辅助人工查看。
 CSV 为 UTF-8 BOM；用 Excel 导入时请把号码、尾四位、货号列设为文本。
 
+PEVA/发S码_PEVA_6张.pdf：6 张
+  发货备注：车型：Lada (ВАЗ) 2121 (4x4) Urban；车身：SUV 3-door（越野车）；年份：1993-2020；尺寸：3640×1690×1640 mm；原因：长度余量过大: 957 mm
 单层PEVA/发2XXXL525码_单层PEVA_8张.pdf：8 张
 单层PEVA/发L码_单层PEVA_18张.pdf：18 张
 单层PEVA/发M码_单层PEVA_16张.pdf：16 张
-单层PEVA/发S码_单层PEVA_7张.pdf：7 张
-  发货备注：车型：Lada (ВАЗ) 2121 (4x4) Urban；车身：SUV 3-door（越野车）；年份：1993-2020；尺寸：3640×1690×1640 mm；原因：长度余量过大: 957 mm
+单层PEVA/发S码_单层PEVA_1张.pdf：1 张
 单层PEVA/发XXL码_单层PEVA_1张.pdf：1 张
 单层PEVA/发YL码_单层PEVA_2张.pdf：2 张
 单层PEVA/发YM码_单层PEVA_1张.pdf：1 张

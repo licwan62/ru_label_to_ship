@@ -3,7 +3,7 @@ from copy import deepcopy
 import pytest
 
 from src.extract_labels import extract_labels
-from src.load_sources import load_products, load_shipments, read_csv, write_csv
+from src.load_sources import load_fuzzy_matches, load_products, load_shipments, read_csv, write_csv
 from src.match_records import match_records
 from tests.conftest import confirmed
 
@@ -71,6 +71,24 @@ def test_override_can_resolve_missing_product(batch):
     assert row["匹配状态"] == "人工确认通过"
     assert row["信息表记录号"] == ""
     assert "manual_overrides" in row["对应依据"]
+
+
+def test_fuzzy_material_mapping_preserves_original(batch, tmp_path):
+    labels, shipments, products = inputs(batch)
+    products[0]["材质"] = "PEVA"
+    archive = tmp_path / "fuzzy_matches.json"
+    archive.write_text('{"材质":{"PEVA":"单层PEVA"}}', encoding="utf-8")
+    row = match_records(labels, shipments, products, fuzzy_matches=load_fuzzy_matches(archive))[0]
+    assert row["原始材质"] == "PEVA"
+    assert row["标准材质"] == "单层PEVA"
+    assert "PEVA→单层PEVA" in row["对应依据"]
+
+
+def test_fuzzy_material_mapping_applies_after_manual_override(batch):
+    labels, shipments, products = inputs(batch)
+    manual = confirmed(labels[0]["完整发货号码"], "0017573", material="PEVA")
+    row = match_records(labels, shipments, products, [manual], {"材质": {"PEVA": "单层PEVA"}})[0]
+    assert row["标准材质"] == "单层PEVA"
 
 
 def test_csv_bom_encoding_and_malformed_headers(tmp_path):

@@ -2,6 +2,7 @@
 
 import csv
 import io
+import json
 import re
 from pathlib import Path
 
@@ -75,6 +76,27 @@ def load_overrides(path: Path):
         row["源记录号"] = index
         row["处理方式"] = row.get("处理方式", "") or "发货"
     return rows
+
+
+def load_fuzzy_matches(path: Path):
+    """读取字段别名档案；当前仅允许材质映射，避免规则静默扩散。"""
+    if not path.exists():
+        return {}
+    try:
+        value = json.loads(path.read_text(encoding="utf-8-sig"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ValueError(f"模糊匹配 JSON 无效：{path}：{exc}") from None
+    if not isinstance(value, dict) or set(value) - {"材质"}:
+        raise ValueError(f"模糊匹配 JSON 顶层仅支持“材质”：{path}")
+    materials = value.get("材质", {})
+    if not isinstance(materials, dict):
+        raise ValueError(f"模糊匹配 JSON 的“材质”必须是对象：{path}")
+    result = {}
+    for source, target in materials.items():
+        if not isinstance(source, str) or not source.strip() or not isinstance(target, str) or not target.strip():
+            raise ValueError(f"模糊匹配 JSON 的材质原值和目标值必须是非空字符串：{path}")
+        result[source.strip()] = target.strip()
+    return {"材质": result}
 
 
 def discover_one(directory: Path, suffix: str):

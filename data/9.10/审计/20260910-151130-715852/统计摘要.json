@@ -1,0 +1,80 @@
+{
+  "模式": "build",
+  "状态": "发货包已生成",
+  "输入页数": 55,
+  "发货单行数": 55,
+  "信息表行数": 134,
+  "通过数": 55,
+  "待确认数": 0,
+  "跳过数": 0,
+  "验证问题数": 0,
+  "状态分布": {
+    "自动匹配通过": 47,
+    "人工确认通过": 8
+  },
+  "配送服务分布": {
+    "GUOO Economy Budget": 23,
+    "GUOO Economy Small": 32
+  },
+  "可分组统计": [
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 8
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 18
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 16
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 7
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "XXL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YL",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YM",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 2
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\input\\labels\\9.10发货.pdf": "a523dc426071c20a2e8c7b1c64c4d1fd49ea40f4a1dd35c9c68d2fa40d6eea0a",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\input\\发货单\\发货商品信息9.10.csv": "6858d4eaa9ef5e500233b6f26212562902bb4c6264a6852099e3aea0bd128b9a",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\input\\信息表\\Ozon上架链接汇总_含发货尺码及无尺码备注.csv": "60d38628259112a3a17a6eff9045e6093d3f6f34dee9a9064d1f85172adaae22",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\manual_overrides.csv": "f8004fe44a30fdff114699d6495617b28bd91f1bf3172ddf403bb49c12ce4f42",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\fuzzy_matches.json": "d72e1a96dcccb522366ff31041596a61d1c850d29919f0e0a48c639753918627"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\审计\\20260910-151130-715852",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\manual_overrides.csv",
+  "发货包目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\output\\发货包",
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\9.10\\fuzzy_matches.json",
+  "输出复核": {
+    "复核页数": 55,
+    "明确跳过页数": 0,
+    "复核PDF数": 8,
+    "文字尺寸顺序复核": "通过",
+    "逐页144DPI像素复核": "通过"
+  }
+}
