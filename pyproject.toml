@@ -7,7 +7,7 @@ name = "ru-label-to-ship"
 version = "0.1.0"
 description = "Ozon 标签解析、精确匹配、审计和发货包生成"
 requires-python = ">=3.10"
-dependencies = ["pypdf>=6.0,<7", "PyMuPDF>=1.26,<2"]
+dependencies = ["pypdf>=6.0,<7", "PyMuPDF>=1.26,<2", "openpyxl>=3.1,<4"]
 
 [project.optional-dependencies]
 test = ["pytest>=8,<10"]

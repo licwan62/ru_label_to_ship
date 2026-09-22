@@ -31,6 +31,22 @@ def test_build_copies_every_page_and_preserves_sources(batch):
     assert source_hashes(saved) == saved
 
 
+def test_build_with_flat_input_dir(flat_batch):
+    input_dir, artifacts_dir = flat_batch
+    assert main(["build", "--input-dir", str(input_dir), "--artifacts-dir", str(artifacts_dir)]) == 0
+    output = artifacts_dir / "output/发货包"
+    assert {p.name for p in output.iterdir()} == {"测试材质", "逐单核对清单.csv", "先看这里_分组说明.txt"}
+    summary = json.loads(next((artifacts_dir / "审计").rglob("统计摘要.json")).read_text(encoding="utf-8"))
+    assert summary["输出复核"]["复核页数"] == 3
+
+
+def test_flat_input_dir_defaults_artifacts_to_sibling(flat_batch, monkeypatch):
+    input_dir, artifacts_dir = flat_batch
+    monkeypatch.chdir(input_dir.parents[1])
+    assert main(["audit", "--input-dir", str(input_dir)]) == 0
+    assert (artifacts_dir / "manual_overrides.csv").exists()
+
+
 def test_blocked_build_writes_audit_only(batch):
     headers, rows = read_csv(batch / "input/信息表/input.csv")
     write_csv(batch / "input/信息表/input.csv", rows[1:], headers)

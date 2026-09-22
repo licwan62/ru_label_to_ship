@@ -16,8 +16,14 @@ def index_rows(rows, key):
 
 
 def standard_size(value):
-    """仅接受独立尺码代码；带说明文字的值必须由人工给出标准代码。"""
+    """仅接受独立尺码代码。"""
     return bool(re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._+\-]*", value))
+
+
+def normalize_size(value):
+    """仅剥离合法尺码代码后的完整中英文括号说明。"""
+    match = re.fullmatch(r"\s*([A-Za-z0-9][A-Za-z0-9._+\-]*)\s*(?:\([^()]*\)|（[^（）]*）)\s*", value)
+    return match.group(1) if match else value
 
 
 def override_errors(override, sku):
@@ -43,6 +49,9 @@ def override_errors(override, sku):
 
 def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None):
     material_aliases = (fuzzy_matches or {}).get("材质", {})
+    sku_rules = (fuzzy_matches or {}).get("货号", {})
+    default_material = (fuzzy_matches or {}).get("默认值", {}).get("材质", "")
+    suffix_size_enabled = (fuzzy_matches or {}).get("货号尾段尺码", False)
     shipment_index = index_rows(shipments, "发货号码")
     product_index = index_rows(products, "货号")
     override_index = index_rows(overrides, "完整发货号码")
@@ -79,16 +88,43 @@ def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None)
                     "信息表记录号": product["源记录号"], "信息表序号": product.get("序号", ""),
                     "来源工作表": product.get("来源工作表", ""),
                     "原始发货尺码": product["发货尺码"], "原始材质": product["材质"],
-                    "标准发货尺码": product["发货尺码"], "标准材质": product["材质"],
+                    "标准发货尺码": normalize_size(product["发货尺码"]), "标准材质": product["材质"],
                     "无尺码备注": product.get("无尺码备注（车型/尺寸）", ""),
                     "对应依据": f"完整发货号码精确匹配发货单记录{shipment['源记录号']}；货号精确匹配信息表记录{product['源记录号']}",
                 })
+                if row["标准发货尺码"] != row["原始发货尺码"]:
+                    row["对应依据"] += f"；尺码括号说明已移除：{row['原始发货尺码']}→{row['标准发货尺码']}"
                 mapped_material = material_aliases.get(row["标准材质"])
                 if mapped_material:
                     row["标准材质"] = mapped_material
                     row["对应依据"] += f"；模糊匹配JSON材质映射：{product['材质']}→{mapped_material}"
             elif len(products_found) > 1:
                 row["信息表记录号"] = ";".join(str(p["源记录号"]) for p in products_found)
+
+            sku_rule = sku_rules.get(shipment["货号"])
+            rule_applied = False
+            if sku_rule:
+                row["标准发货尺码"] = sku_rule["发货尺码"]
+                row["标准材质"] = sku_rule["材质"]
+                mapped_material = material_aliases.get(row["标准材质"])
+                if mapped_material:
+                    row["标准材质"] = mapped_material
+                row["对应依据"] += (
+                    f"；模糊匹配JSON货号规则：{shipment['货号']}→"
+                    f"{row['标准发货尺码']}/{row['标准材质']}"
+                )
+                rule_applied = True
+
+            if not rule_applied and not products_found and suffix_size_enabled and "_" in shipment["货号"]:
+                suffix_size = shipment["货号"].rsplit("_", 1)[1]
+                if standard_size(suffix_size):
+                    row["标准发货尺码"] = suffix_size
+                    row["对应依据"] += f"；模糊匹配JSON货号尾段尺码：{shipment['货号']}→{suffix_size}"
+                    rule_applied = True
+
+            if not row["标准材质"] and default_material:
+                row["标准材质"] = material_aliases.get(default_material, default_material)
+                row["对应依据"] += f"；模糊匹配JSON默认材质：{row['标准材质']}"
 
             manual = override_index.get(label["完整发货号码"], [])
             confirmed = False
@@ -118,7 +154,7 @@ def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None)
                     f"；处理方式={override.get('处理方式') or '发货'}"
                 )
             if not skipped:
-                if not products_found and not confirmed:
+                if not products_found and not confirmed and not rule_applied:
                     errors.insert(0, "货号未匹配")
                 if len(products_found) > 1:
                     errors.insert(0, "货号重复匹配")

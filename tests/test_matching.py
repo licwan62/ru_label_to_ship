@@ -38,12 +38,14 @@ def test_duplicate_products_block_even_with_override(batch):
     assert match_records(labels, shipments, products, [manual])[0]["匹配状态"] == "货号重复匹配"
 
 
-def test_annotated_size_requires_confirmation_of_size_and_material(batch):
+def test_annotated_size_is_normalized_and_manual_override_still_wins(batch):
     labels, shipments, products = inputs(batch)
     products[0]["发货尺码"] = "S(应该发ys，但是没有就发s)"
     products[0]["材质"] = "PEVA"
     before = match_records(labels, shipments, products)[0]
-    assert before["匹配状态"] == "等待人工确认"
+    assert before["匹配状态"] == "自动匹配通过"
+    assert before["标准发货尺码"] == "S"
+    assert "括号说明已移除" in before["对应依据"]
     manual = confirmed(labels[0]["完整发货号码"], "0017573", "YS", "测试已确认材质")
     after = match_records(labels, shipments, products, [manual])[0]
     assert after["匹配状态"] == "人工确认通过"
@@ -89,6 +91,28 @@ def test_fuzzy_material_mapping_applies_after_manual_override(batch):
     manual = confirmed(labels[0]["完整发货号码"], "0017573", material="PEVA")
     row = match_records(labels, shipments, products, [manual], {"材质": {"PEVA": "单层PEVA"}})[0]
     assert row["标准材质"] == "单层PEVA"
+
+
+def test_reusable_sku_rule_resolves_nonstandard_or_missing_product(batch):
+    labels, shipments, products = inputs(batch)
+    products[0]["发货尺码"] = "S(说明文字)"
+    products[0]["材质"] = "PEVA"
+    rules = {"材质": {"PEVA": "单层PEVA"}, "货号": {"0017573": {"发货尺码": "S", "材质": "PEVA"}}}
+    row = match_records(labels, shipments, products, fuzzy_matches=rules)[0]
+    assert row["匹配状态"] == "自动匹配通过"
+    assert (row["标准发货尺码"], row["标准材质"]) == ("S", "单层PEVA")
+
+    row = match_records(labels, shipments, products[1:], fuzzy_matches=rules)[0]
+    assert row["匹配状态"] == "自动匹配通过"
+
+
+def test_unmatched_sku_can_use_valid_final_underscore_segment_as_size(batch):
+    labels, shipments, products = inputs(batch)
+    next(row for row in shipments if row["发货号码"] == labels[0]["完整发货号码"])["货号"] = "Mercedes-Benz_E-Class_3XL"
+    rules = {"默认值": {"材质": "单层PEVA"}, "货号尾段尺码": True}
+    row = match_records(labels, shipments, products, fuzzy_matches=rules)[0]
+    assert row["匹配状态"] == "自动匹配通过"
+    assert (row["标准发货尺码"], row["标准材质"]) == ("3XL", "单层PEVA")
 
 
 def test_csv_bom_encoding_and_malformed_headers(tmp_path):

@@ -1,0 +1,74 @@
+{
+  "模式": "audit",
+  "状态": "阻断",
+  "输入页数": 95,
+  "发货单行数": 95,
+  "信息表行数": 134,
+  "通过数": 90,
+  "待确认数": 5,
+  "跳过数": 0,
+  "验证问题数": 5,
+  "状态分布": {
+    "自动匹配通过": 90,
+    "货号未匹配": 5
+  },
+  "配送服务分布": {
+    "GUOO Economy Budget": 44,
+    "GUOO Economy Small": 50,
+    "GUOO Standard Big": 1
+  },
+  "可分组统计": [
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 10
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 31
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 27
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 15
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "XXL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YL",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YM",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 2
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\input\\labels\\货物标签.pdf": "afeb12ac454821193649d8f64ee7c4169042f34b0934f72a4c97bbe30f587510",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\input\\发货单\\9.11发货编号.pdf": "b3b7150e86a45c2c8f01843715829adbc9b7083e357e784d75d2bc65b9e20a0e",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\input\\信息表\\Ozon上架链接汇总_含发货尺码及无尺码备注.csv": "60d38628259112a3a17a6eff9045e6093d3f6f34dee9a9064d1f85172adaae22",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\manual_overrides.csv": "816d012ea7defdd9be35813b69aa97608a2c931b80718fcc64bf80bcdb885ac5",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\fuzzy_matches.json": "f9be089e351a8e4b00844372d261a3a0d2781e9f9574d3b338a101de06531473"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\审计\\20260911-105734-589186",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\manual_overrides.csv",
+  "发货包目录": null,
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\data\\0911\\fuzzy_matches.json"
+}

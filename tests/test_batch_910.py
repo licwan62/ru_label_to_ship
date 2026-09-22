@@ -14,7 +14,7 @@ from tests.conftest import ROOT, confirmed
 
 
 def test_real_910_matches_startup(tmp_path):
-    batch = ROOT / "data/9.10"
+    batch = ROOT / "sample/9.10"
     pdf = discover_one(batch / "input/labels", ".pdf")
     shipment = discover_one(batch / "input/发货单", ".csv")
     products_path = discover_one(batch / "input/信息表", ".csv")
@@ -31,9 +31,9 @@ def test_real_910_matches_startup(tmp_path):
     assert labels[0]["分拣标识"] == "C / ПВЗ"
     assert "Россия" in labels[0]["收货地址原文"]
     assert matches[0]["货号"] == "20260803013"
-    assert Counter(row["匹配状态"] for row in matches) == {"自动匹配通过": 47, "等待人工确认": 6, "货号未匹配": 2}
+    assert Counter(row["匹配状态"] for row in matches) == {"自动匹配通过": 53, "货号未匹配": 2}
     assert {row["货号"] for row in matches if row["匹配状态"] == "货号未匹配"} == {"VESTA-2M", "0017573"}
-    assert len(validate_records(labels, shipments, matches)) == 8
+    assert len(validate_records(labels, shipments, matches)) == 2
     # 在隔离目录验证完整链路，包括真实二维码和俄文的逐页像素不变。
     isolated = tmp_path / "simulated_910_NOT_FOR_SHIPPING"
     for source, folder in [(pdf, "labels"), (shipment, "发货单"), (products_path, "信息表")]:

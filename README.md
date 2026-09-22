@@ -4,43 +4,59 @@
 
 ## 安装与运行
 
-固定批次格式以当前 `data/9.10` 为准，其他日期批次使用相同结构：
+有两种批次目录格式，二选一：
+
+**固定格式批次**（历史约定，回归样本 `sample/9.10` 仍用此结构）：
 
 ```text
-data/<批次>/
+sample/<批次>/
   input/
     labels/        # 唯一原始标签 PDF
-    发货单/         # 唯一发货单 CSV；可另存 PDF、.bak，不参与匹配
+    发货单/         # 唯一发货单 CSV 或 PDF；可另存 .bak，不参与匹配
     信息表/         # 唯一商品信息 CSV
   manual_overrides.csv
   fuzzy_matches.json      # 可复用的字段别名映射
   output/
     发货包/         # 分组 PDF、逐单核对清单、分组说明
-    发货包.zip      # 可选的交付压缩包，当前命令不自动压缩
   审计/             # 每次运行的时间戳目录
-  发货资料/          # 已移出的资料
-  历史发货包/        # 归档目录
-  映射历史/          # 映射备份目录
 ```
 
-运行时 `--batch` 指向批次根目录，不指向 `input`。默认不回退到旧版根目录输入位置；必要时可用单文件参数显式指定。审计和历史目录按需创建，不要求新批次预先准备。
+运行时 `--batch` 指向批次根目录，不指向 `input`。审计和历史目录按需创建，不要求新批次预先准备。
+
+**扁平输入目录**（日常新批次使用，输入与产物分开存放，互不污染）：
+
+```text
+input/<批次>/        # 原始文件平铺一处，无需分子目录
+  <含“标签”/label 的 PDF>       # 原始标签
+  <含“发货编号”/“发货单”/shipment 的 PDF 或 CSV>  # 发货单
+  <含“信息表”/“上架”/product 的 CSV>              # 商品信息表
+artifacts/<批次>/     # 全部产物与人工确认，默认与 input/<批次> 同名对应
+  manual_overrides.csv
+  fuzzy_matches.json
+  output/发货包/
+  审计/
+```
+
+运行时用 `--input-dir` 指向原始文件目录，`--artifacts-dir` 可省略（默认 `artifacts/<--input-dir 目录名>`）。程序按文件名关键字自动识别标签/发货单/信息表；命中多个或零个候选时会报错并要求改用 `--labels`/`--shipment`/`--products` 显式指定，不做静默猜测。
 
 需要 Python 3.10 或更新版本。在项目根目录执行：
 
 ```powershell
 python -m pip install -e ".[test]"
-python -m src.cli audit --batch data/9.10
-python -m src.cli build --batch data/9.10
+python -m src.cli audit --batch sample/9.10
+python -m src.cli build --batch sample/9.10
+python -m src.cli audit --input-dir input/0911
+python -m src.cli build --input-dir input/0911 --artifacts-dir artifacts/0911
 python -m pytest -q
 ```
 
-也可使用安装后的 `ozon-ship audit --batch data/9.10`。运行依赖为 PyMuPDF 和 pypdf；pytest 仅用于测试。
+也可使用安装后的 `ozon-ship audit --batch sample/9.10`。运行依赖为 PyMuPDF 和 pypdf；pytest 仅用于测试。
 
-默认在批次的 `input/labels/`、`input/发货单/`、`input/信息表/` 下分别寻找唯一一个 PDF、CSV、CSV。存在多个候选文件时拒绝猜测，可显式指定：
+固定格式批次默认在 `input/labels/`、`input/发货单/`、`input/信息表/` 下分别寻找唯一一个 PDF、CSV/PDF、CSV。存在多个候选文件时拒绝猜测，可显式指定：
 
 ```powershell
-python -m src.cli audit --batch data/9.10 --labels "data/9.10/input/labels/9.10发货.pdf" --shipment "data/9.10/input/发货单/发货商品信息9.10.csv" --products "data/9.10/input/信息表/Ozon上架链接汇总_含发货尺码及无尺码备注.csv"
-python -m src.cli build --batch data/9.10 --overrides data/9.10/manual_overrides.csv --output data/9.10/output/发货包_复跑
+python -m src.cli audit --batch sample/9.10 --labels "sample/9.10/input/labels/9.10发货.pdf" --shipment "sample/9.10/input/发货单/发货商品信息9.10.csv" --products "sample/9.10/input/信息表/Ozon上架链接汇总_含发货尺码及无尺码备注.csv"
+python -m src.cli build --batch sample/9.10 --overrides sample/9.10/manual_overrides.csv --output sample/9.10/output/发货包_复跑
 ```
 
 `--output` 在 audit 模式指定审计目录，在 build 模式指定正式发货包目录。输出目标必须尚不存在；复跑时使用新目录，保留历史结果。
@@ -49,7 +65,7 @@ python -m src.cli build --batch data/9.10 --overrides data/9.10/manual_overrides
 
 ## 人工确认与明确跳过
 
-首次审计自动创建 `data/<批次>/manual_overrides.csv`，列出待处理订单，确认值留空。已有覆盖表不会被自动改写。后续新增问题可从本次待确认清单补入覆盖表。
+首次审计自动创建批次根目录（固定格式为 `sample/<批次>/manual_overrides.csv`；扁平输入目录为 `artifacts/<批次>/manual_overrides.csv`）下的覆盖表，列出待处理订单，确认值留空。已有覆盖表不会被自动改写。后续新增问题可从本次待确认清单补入覆盖表。
 
 | 字段 | 填写要求 |
 | --- | --- |
@@ -77,6 +93,7 @@ python -m src.cli build --batch data/9.10 --overrides data/9.10/manual_overrides
 - 仅去除字段两端空白，完整号码、货号、尾号始终为文本。CSV 不解包 `="..."`，不改变大小写、不删除前导零；除 JSON 显式配置的字段别名外，不做模糊匹配。
 - 批次根目录可放置 `fuzzy_matches.json`，将已知字段别名统一为最终分组值。当前支持材质映射，按完整原值匹配；原始材质仍保留在审计表。也可用 `--fuzzy-matches` 指定其他档案。
 - 读取 UTF-8（含 BOM）、GB18030、带 BOM 的 UTF-16，支持引号、逗号和字段内换行。输出统一为 UTF-8 BOM。商品和照片公式保留为源字段。
+- 信息表也可直接用 `.xlsx`/`.xlsm`：只认工作表名中含“汇总”且唯一的那一个，避免误读分店明细表；若“货号”“发货尺码”“材质”任一单元格被 Excel 存成数字（可能丢失前导零）会直接报错，需改回文本格式。
 - Excel 打开 CSV 可能自动数值化标识符；请从“数据 → 从文本/CSV”导入，将完整发货号码、货号、尾四位设为文本。程序不会插入 Excel 公式来包装号码。
 - 尾四位取完整发货号码**第一段的最后四位**，与 9.7 样例一致；只供查看。
 - 自动尺码要求独立的字母数字代码，允许 `.`、`_`、`+`、`-`；说明文字或其他形式需人工确认标准代码。材质仅按 JSON 中显式登记的别名合并。
@@ -87,7 +104,7 @@ python -m src.cli build --batch data/9.10 --overrides data/9.10/manual_overrides
 
 ## 输出与验收
 
-每次运行均建立独立 `data/<批次>/审计/<时间戳>/`：
+每次运行均建立独立的 `<批次根目录>/审计/<时间戳>/`（固定格式为 `sample/<批次>/审计/…`；扁平输入目录为 `artifacts/<批次>/审计/…`）：
 
 ```text
 labels_parsed.csv
@@ -103,13 +120,13 @@ manual_overrides.csv（本次使用的覆盖表快照）
 成功 build 的默认输出：
 
 ```text
-data/<批次>/output/发货包/
+<批次根目录>/output/发货包/
   逐单核对清单.csv
   先看这里_分组说明.txt
   <标准材质>/发<标准尺码>码_<标准材质>_<页数>张.pdf
 ```
 
-发货包按 9.7 案例只保留仓库使用的分组 PDF、核对清单和分组说明，不含待确认目录。完整匹配表、跳过清单、覆盖快照和统计摘要保存在包外的审计目录。现有 9.10 包中移出的资料保存在 `data/9.10/发货资料/`。可编辑覆盖表仍为 `data/9.10/manual_overrides.csv`。
+发货包按 9.7 案例只保留仓库使用的分组 PDF、核对清单和分组说明，不含待确认目录。完整匹配表、跳过清单、覆盖快照和统计摘要保存在包外的审计目录。9.10 样本中移出的资料保存在 `sample/9.10/发货资料/`。可编辑覆盖表仍为 `<批次根目录>/manual_overrides.csv`。
 
 使用 pypdf 直接复制原页，不新增封面、不缩放、不裁剪、不旋转、不栅格化。组内按原页码升序。文件名清洗同时检查 Windows 保留名称、清洗后的重名和大小写碰撞。
 

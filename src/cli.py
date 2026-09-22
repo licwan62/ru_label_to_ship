@@ -1,4 +1,5 @@
-"""python -m src.cli audit|build --batch data/9.10"""
+"""python -m src.cli audit|build --batch sample/9.10
+python -m src.cli audit|build --input-dir input/0911 [--artifacts-dir artifacts/0911]"""
 
 import argparse
 import csv
@@ -13,9 +14,9 @@ from pypdf.errors import PyPdfError
 
 from .build_package import build_package
 from .extract_labels import extract_labels
-from .load_sources import discover_one, load_fuzzy_matches, load_overrides, load_products, load_shipments, write_csv
+from .load_sources import discover_flat, discover_one, discover_shipment, load_fuzzy_matches, load_overrides, load_products, load_shipments, write_csv
 from .match_records import match_records
-from .schema import ISSUE_FIELDS, LABEL_FIELDS, MATCH_FIELDS, OVERRIDE_FIELDS, PASS_STATUSES, SKIP_STATUS
+from .schema import ISSUE_FIELDS, LABEL_FIELDS, MATCH_FIELDS, OVERRIDE_FIELDS, PENDING_FIELDS, PASS_STATUSES, SKIP_STATUS
 from .validate_records import source_hashes, validate_records, verify_sources
 
 
@@ -32,13 +33,49 @@ def new_output(path, inputs):
     return path
 
 
+def concise_pending(rows):
+    result = []
+    for row in rows:
+        if not row["货号"]:
+            problem, advice = "发货单缺少货号", "补充货号后重新审计"
+        elif row["匹配状态"] == "货号未匹配":
+            problem, advice = "信息表和规则包均无此货号", "在规则包添加尺码、材质，或逐单确认"
+        elif row["匹配状态"] == "材质缺失":
+            problem, advice = "信息表材质为空", "确认材质"
+        elif "原始尺码含说明" in row["验证信息"]:
+            problem, advice = "尺码含说明文字，不能自动分组", "确认标准尺码和材质"
+        else:
+            problem, advice = row["匹配状态"], row["验证信息"]
+        result.append({
+            "完整发货号码": row["完整发货号码"], "货号": row["货号"],
+            "发货尺码": row["原始发货尺码"], "材质": row["原始材质"],
+            "问题": problem, "处理建议": advice,
+        })
+    return result
+
+
 def run(args):
-    batch = args.batch.resolve()
-    if not batch.is_dir():
-        raise ValueError(f"批次目录不存在：{batch}")
-    labels_path = args.labels.resolve() if args.labels else discover_one(batch / "input/labels", ".pdf")
-    shipment_path = args.shipment.resolve() if args.shipment else discover_one(batch / "input/发货单", ".csv")
-    products_path = args.products.resolve() if args.products else discover_one(batch / "input/信息表", ".csv")
+    if args.artifacts_dir and not args.input_dir:
+        raise ValueError("--artifacts-dir 必须配合 --input-dir 使用")
+    if args.input_dir:
+        input_dir = args.input_dir.resolve()
+        if not input_dir.is_dir():
+            raise ValueError(f"输入目录不存在：{input_dir}")
+        artifacts_dir = (args.artifacts_dir or Path("artifacts") / input_dir.name).resolve()
+        flat_labels, flat_shipment, flat_products = (None, None, None)
+        if not (args.labels and args.shipment and args.products):
+            flat_labels, flat_shipment, flat_products = discover_flat(input_dir)
+        labels_path = args.labels.resolve() if args.labels else flat_labels
+        shipment_path = args.shipment.resolve() if args.shipment else flat_shipment
+        products_path = args.products.resolve() if args.products else flat_products
+        batch = artifacts_dir
+    else:
+        batch = args.batch.resolve()
+        if not batch.is_dir():
+            raise ValueError(f"批次目录不存在：{batch}")
+        labels_path = args.labels.resolve() if args.labels else discover_one(batch / "input/labels", ".pdf")
+        shipment_path = args.shipment.resolve() if args.shipment else discover_shipment(batch / "input/发货单")
+        products_path = args.products.resolve() if args.products else discover_one(batch / "input/信息表", ".csv")
     override_path = (args.overrides or batch / "manual_overrides.csv").resolve()
     fuzzy_path = (args.fuzzy_matches or batch / "fuzzy_matches.json").resolve()
     inputs = [labels_path, shipment_path, products_path]
@@ -70,7 +107,7 @@ def run(args):
     write_csv(audit_path / "labels_parsed.csv", labels, LABEL_FIELDS)
     write_csv(audit_path / "shipment_normalized.csv", shipments, shipment_fields)
     write_csv(audit_path / "完整匹配表.csv", matches, MATCH_FIELDS)
-    write_csv(audit_path / "待确认/待确认清单.csv", pending, MATCH_FIELDS)
+    write_csv(audit_path / "待确认/待确认清单.csv", concise_pending(pending), PENDING_FIELDS)
     write_csv(audit_path / "跳过清单.csv", skipped, MATCH_FIELDS)
     write_csv(audit_path / "验证问题.csv", issues, ISSUE_FIELDS)
     if overrides:
@@ -137,9 +174,12 @@ def parser():
     commands = root.add_subparsers(dest="command", required=True)
     for command in ("audit", "build"):
         sub = commands.add_parser(command, help="只生成审计文件" if command == "audit" else "全部验证通过后生成正式发货包")
-        sub.add_argument("--batch", type=Path, required=True, help="固定格式批次根目录，如 data/9.10（包含 input/、output/）")
+        group = sub.add_mutually_exclusive_group(required=True)
+        group.add_argument("--batch", type=Path, help="固定格式批次根目录，如 sample/9.10（内含 input/labels、input/发货单、input/信息表 子目录，输出写回同一目录）")
+        group.add_argument("--input-dir", type=Path, help="扁平原始文件目录，如 input/0911；按文件名关键字识别标签/发货单/信息表，输出写入 --artifacts-dir")
+        sub.add_argument("--artifacts-dir", type=Path, help="配合 --input-dir 使用；默认 artifacts/<--input-dir 目录名>")
         sub.add_argument("--labels", type=Path, help="指定原标签 PDF")
-        sub.add_argument("--shipment", type=Path, help="指定发货单 CSV")
+        sub.add_argument("--shipment", type=Path, help="指定发货单 CSV 或 PDF")
         sub.add_argument("--products", type=Path, help="指定信息表 CSV")
         sub.add_argument("--overrides", type=Path, help="指定已存在的逐单人工覆盖表")
         sub.add_argument("--fuzzy-matches", type=Path, help="指定材质等字段的模糊匹配 JSON 档案")

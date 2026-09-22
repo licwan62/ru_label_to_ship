@@ -6,7 +6,7 @@ from pathlib import Path
 import pymupdf
 
 NUMBER_RE = re.compile(r"(?<![\w-])[0-9]+-[0-9]{4}-[0-9](?![\w-])")
-SERVICE_RE = re.compile(r"\bGUOO\s+Economy\s+(Budget|Small)\b")
+SERVICE_RE = re.compile(r"\bGUOO\s+(Economy\s+(?:Budget|Small)|Standard\s+Big)\b")
 
 
 def shipment_numbers(text: str):
@@ -40,7 +40,7 @@ def parse_text(text: str, page_number: int, width=0, height=0):
     return {
         "原标签页码": page_number, "完整发货号码": number, "尾四位": tail_four(number),
         "Ozon Global号": global_match.group(1) if global_match else "",
-        "配送服务": f"GUOO Economy {services[0]}" if len(services) == 1 else "",
+        "配送服务": f"GUOO {' '.join(services[0].split())}" if len(services) == 1 else "",
         "分拣标识": " / ".join(sorting), "收货地址原文": "\n".join(lines).strip(),
         "中国地址原文": text[china_start:china_end].strip() if china_start >= 0 else "",
         "二维码内容": "", "解析状态": "；".join(issues) if issues else "通过",
@@ -54,4 +54,3 @@ def extract_labels(path: Path):
             raise ValueError("标签 PDF 已加密，需要可直接读取的原始 PDF")
         return [parse_text(page.get_text(sort=False), index, page.mediabox.width, page.mediabox.height)
                 for index, page in enumerate(document, 1)]
-

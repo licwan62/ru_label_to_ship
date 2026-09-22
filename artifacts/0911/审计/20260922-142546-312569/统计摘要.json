@@ -1,0 +1,79 @@
+{
+  "模式": "audit",
+  "状态": "审计通过",
+  "输入页数": 95,
+  "发货单行数": 95,
+  "信息表行数": 134,
+  "通过数": 94,
+  "待确认数": 0,
+  "跳过数": 1,
+  "验证问题数": 0,
+  "状态分布": {
+    "自动匹配通过": 94,
+    "用户指定跳过": 1
+  },
+  "配送服务分布": {
+    "GUOO Economy Budget": 44,
+    "GUOO Economy Small": 50,
+    "GUOO Standard Big": 1
+  },
+  "可分组统计": [
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 10
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "3XL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 31
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 28
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 17
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "XXL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YL",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YM",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 2
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0911\\货物标签.pdf": "afeb12ac454821193649d8f64ee7c4169042f34b0934f72a4c97bbe30f587510",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0911\\9.11发货编号.pdf": "b3b7150e86a45c2c8f01843715829adbc9b7083e357e784d75d2bc65b9e20a0e",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0911\\Ozon上架链接汇总_含发货尺码及无尺码备注.csv": "60d38628259112a3a17a6eff9045e6093d3f6f34dee9a9064d1f85172adaae22",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0911\\manual_overrides.csv": "66197324f03597a6f674f1dbbdff153be5d9f5ab72f0d2fc662b6f21fbfc9c54",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0911\\fuzzy_matches.json": "063ec92a7f1510c8531aa6f433b40b73d125a02b6c212eae2d8929b3e64925c3"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0911\\审计\\20260922-142546-312569",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0911\\manual_overrides.csv",
+  "发货包目录": null,
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0911\\fuzzy_matches.json"
+}
