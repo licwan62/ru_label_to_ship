@@ -26,6 +26,12 @@ def normalize_size(value):
     return match.group(1) if match else value
 
 
+def normalize_material(value):
+    """仅剥离材质末尾的完整中英文括号说明，例如 单层PEVA（灰色无耳）→ 单层PEVA。"""
+    match = re.fullmatch(r"\s*(\S.*?)\s*(?:\([^()]*\)|（[^（）]*）)\s*", value)
+    return match.group(1) if match else value
+
+
 def override_errors(override, sku):
     errors = []
     action = override.get("处理方式") or "发货"
@@ -52,6 +58,7 @@ def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None)
     sku_rules = (fuzzy_matches or {}).get("货号", {})
     default_material = (fuzzy_matches or {}).get("默认值", {}).get("材质", "")
     suffix_size_enabled = (fuzzy_matches or {}).get("货号尾段尺码", False)
+    material_brackets_enabled = (fuzzy_matches or {}).get("材质括号说明", False)
     shipment_index = index_rows(shipments, "发货号码")
     product_index = index_rows(products, "货号")
     override_index = index_rows(overrides, "完整发货号码")
@@ -94,6 +101,11 @@ def match_records(labels, shipments, products, overrides=(), fuzzy_matches=None)
                 })
                 if row["标准发货尺码"] != row["原始发货尺码"]:
                     row["对应依据"] += f"；尺码括号说明已移除：{row['原始发货尺码']}→{row['标准发货尺码']}"
+                if material_brackets_enabled:
+                    stripped_material = normalize_material(row["标准材质"])
+                    if stripped_material != row["标准材质"]:
+                        row["对应依据"] += f"；材质括号说明已移除：{row['标准材质']}→{stripped_material}"
+                        row["标准材质"] = stripped_material
                 mapped_material = material_aliases.get(row["标准材质"])
                 if mapped_material:
                     row["标准材质"] = mapped_material

@@ -93,6 +93,31 @@ def test_fuzzy_material_mapping_applies_after_manual_override(batch):
     assert row["标准材质"] == "单层PEVA"
 
 
+def test_material_brackets_are_stripped_when_enabled(batch):
+    labels, shipments, products = inputs(batch)
+    products[0]["材质"] = "单层PEVA（灰色无耳）"
+    rules = {"材质括号说明": True}
+    row = match_records(labels, shipments, products, fuzzy_matches=rules)[0]
+    assert row["原始材质"] == "单层PEVA（灰色无耳）"
+    assert row["标准材质"] == "单层PEVA"
+    assert "材质括号说明已移除：单层PEVA（灰色无耳）→单层PEVA" in row["对应依据"]
+
+
+def test_material_brackets_untouched_when_disabled(batch):
+    labels, shipments, products = inputs(batch)
+    products[0]["材质"] = "单层PEVA（灰色无耳）"
+    row = match_records(labels, shipments, products)[0]
+    assert row["标准材质"] == "单层PEVA（灰色无耳）"
+
+
+def test_material_brackets_stripped_before_alias_mapping(batch):
+    labels, shipments, products = inputs(batch)
+    products[0]["材质"] = "PEVA（灰色无耳）"
+    rules = {"材质括号说明": True, "材质": {"PEVA": "单层PEVA"}}
+    row = match_records(labels, shipments, products, fuzzy_matches=rules)[0]
+    assert row["标准材质"] == "单层PEVA"
+
+
 def test_reusable_sku_rule_resolves_nonstandard_or_missing_product(batch):
     labels, shipments, products = inputs(batch)
     products[0]["发货尺码"] = "S(说明文字)"

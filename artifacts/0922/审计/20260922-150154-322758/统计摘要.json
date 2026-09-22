@@ -1,0 +1,82 @@
+{
+  "模式": "audit",
+  "状态": "审计通过",
+  "输入页数": 70,
+  "发货单行数": 70,
+  "信息表行数": 162,
+  "通过数": 70,
+  "待确认数": 0,
+  "跳过数": 0,
+  "验证问题数": 0,
+  "状态分布": {
+    "自动匹配通过": 70
+  },
+  "配送服务分布": {
+    "GUOO Economy Small": 19,
+    "GUOO Economy Budget": 51
+  },
+  "可分组统计": [
+    {
+      "材质": "PEVA加铝膜",
+      "发货尺码": "XLL",
+      "页数": 1
+    },
+    {
+      "材质": "PEVA加铝膜",
+      "发货尺码": "YXL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 15
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 16
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 13
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 15
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "XLL",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YL",
+      "页数": 4
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YM",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 2
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0922\\9.22标签.pdf": "9bec50de3faaba5156c0f83b098fd61b8eebb6fe65fb74187314680e2ba11086",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0922\\9.22发货单.pdf": "93adb458219192e3bc5e4cffc92c4a262984a37a26b014b0355cb3527b1bd22e",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0922\\Ozon上架链接汇总_两店对应完成(1).xlsx": "be4984806367e4814983aa750ce0693c99b43abc00b1d09221365f0f3d25cf9c",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0922\\manual_overrides.csv": "a56ab06fdecfe96e61425db08f0ec19f937a57c9befc993028d1a9a7f8e06eb4",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0922\\fuzzy_matches.json": "dff78f38e64053b1134ba98d2a8832f5a99081241243eeb1e50b6aea2a606a40"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0922\\审计\\20260922-150154-322758",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0922\\manual_overrides.csv",
+  "发货包目录": null,
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0922\\fuzzy_matches.json"
+}

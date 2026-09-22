@@ -178,7 +178,7 @@ def load_fuzzy_matches(path: Path):
         value = json.loads(path.read_text(encoding="utf-8-sig"))
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError(f"模糊匹配 JSON 无效：{path}：{exc}") from None
-    if not isinstance(value, dict) or set(value) - {"材质", "货号", "默认值", "货号尾段尺码"}:
+    if not isinstance(value, dict) or set(value) - {"材质", "货号", "默认值", "货号尾段尺码", "材质括号说明"}:
         raise ValueError(f"模糊匹配 JSON 包含不支持的顶层规则：{path}")
     materials = value.get("材质", {})
     if not isinstance(materials, dict):
@@ -206,9 +206,12 @@ def load_fuzzy_matches(path: Path):
     suffix_size = value.get("货号尾段尺码", False)
     if not isinstance(suffix_size, bool):
         raise ValueError(f"模糊匹配 JSON 的“货号尾段尺码”必须是 true 或 false：{path}")
+    material_brackets = value.get("材质括号说明", False)
+    if not isinstance(material_brackets, bool):
+        raise ValueError(f"模糊匹配 JSON 的“材质括号说明”必须是 true 或 false：{path}")
     return {"材质": result, "货号": normalized_skus,
             "默认值": {"材质": defaults["材质"].strip()} if defaults.get("材质") else {},
-            "货号尾段尺码": suffix_size}
+            "货号尾段尺码": suffix_size, "材质括号说明": material_brackets}
 
 
 def discover_one(directory: Path, suffix: str):

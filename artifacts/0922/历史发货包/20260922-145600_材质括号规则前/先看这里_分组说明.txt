@@ -6,13 +6,14 @@
 尾四位取完整发货号码第一段的后四位，仅辅助人工查看。
 CSV 为 UTF-8 BOM；用 Excel 导入时请把号码、尾四位、货号列设为文本。
 
-PEVA加铝膜/发XLL码_PEVA加铝膜_1张.pdf：1 张
-PEVA加铝膜/发YXL码_PEVA加铝膜_1张.pdf：1 张
+PEVA加铝膜（带后视镜耳朵）/发XLL码_PEVA加铝膜（带后视镜耳朵）_1张.pdf：1 张
+PEVA加铝膜（带后视镜耳朵）/发YXL码_PEVA加铝膜（带后视镜耳朵）_1张.pdf：1 张
 单层PEVA/发2XXXL525码_单层PEVA_15张.pdf：15 张
-单层PEVA/发L码_单层PEVA_16张.pdf：16 张
+单层PEVA/发L码_单层PEVA_15张.pdf：15 张
 单层PEVA/发M码_单层PEVA_13张.pdf：13 张
 单层PEVA/发S码_单层PEVA_15张.pdf：15 张
 单层PEVA/发XLL码_单层PEVA_2张.pdf：2 张
 单层PEVA/发YL码_单层PEVA_4张.pdf：4 张
 单层PEVA/发YM码_单层PEVA_1张.pdf：1 张
 单层PEVA/发YXL码_单层PEVA_2张.pdf：2 张
+单层PEVA（灰色无耳）/发L码_单层PEVA（灰色无耳）_1张.pdf：1 张
