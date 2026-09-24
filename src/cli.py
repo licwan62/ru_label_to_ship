@@ -13,6 +13,7 @@ from pathlib import Path
 from pypdf.errors import PyPdfError
 
 from .build_package import build_package
+from .dedupe_batch import dedupe_batch
 from .extract_labels import extract_labels
 from .load_sources import discover_flat, discover_one, discover_shipment, load_fuzzy_matches, load_overrides, load_products, load_shipments, write_csv
 from .match_records import match_records
@@ -169,6 +170,27 @@ def run(args):
     return 0
 
 
+def run_dedupe(args):
+    old_labels = args.old_labels.resolve()
+    old_shipment = args.old_shipment.resolve()
+    new_labels = args.new_labels.resolve()
+    new_shipment = args.new_shipment.resolve()
+    output = new_output(args.output, [old_labels, old_shipment, new_labels, new_shipment])
+    output.mkdir(parents=True)
+    report = dedupe_batch(old_labels, old_shipment, new_labels, new_shipment, output)
+    write_json(output / "去重报告.json", report)
+    print(f"去重完成：新标签{report['新标签页数']}页，剔除{report['重复标签页数']}页重复，新增{report['新增标签页数']}页。")
+    print(f"新发货单{report['新发货单行数']}行，剔除{report['重复发货单行数']}行重复，新增{report['新增发货单行数']}行。")
+    if report["新增标签有号码但发货单无对应记录"] or report["新增发货单有号码但标签无对应页"]:
+        print("警告：新增标签与新增发货单的号码集合不一致，见去重报告.json。")
+    if report["新增标签中解析异常页（号码格式不标准，需人工核对原PDF）"]:
+        print("警告：存在号码格式不标准、未能自动识别的标签页，见去重报告.json，需人工核对原PDF后手动补录。")
+    if report["新增发货单中疑似列错位的行（标签与发货号码尾四位不符，已从输出中剔除，需人工核对原PDF）"]:
+        print("警告：存在疑似列错位（货号/商品被拼接）的发货单行，已从新增发货单.csv中剔除，见去重报告.json，需人工核对原PDF后手动补录。")
+    print(f"输出目录：{output}")
+    return 0
+
+
 def parser():
     root = argparse.ArgumentParser(description="Ozon 原始标签转发货包；有阻断项时禁止生成 PDF")
     commands = root.add_subparsers(dest="command", required=True)
@@ -184,6 +206,12 @@ def parser():
         sub.add_argument("--overrides", type=Path, help="指定已存在的逐单人工覆盖表")
         sub.add_argument("--fuzzy-matches", type=Path, help="指定材质等字段的模糊匹配 JSON 档案")
         sub.add_argument("--output", type=Path, help="新输出目录；audit 为审计目录，build 为正式发货包目录")
+    dedupe = commands.add_parser("dedupe", help="比较新旧批次标签/发货单，剔除新批次中已在旧批次出现过的记录")
+    dedupe.add_argument("--old-labels", required=True, type=Path, help="旧批次原标签 PDF")
+    dedupe.add_argument("--old-shipment", required=True, type=Path, help="旧批次发货单 CSV 或 PDF")
+    dedupe.add_argument("--new-labels", required=True, type=Path, help="新批次原标签 PDF（含旧批次全部原页）")
+    dedupe.add_argument("--new-shipment", required=True, type=Path, help="新批次发货单 CSV 或 PDF（含旧批次全部记录）")
+    dedupe.add_argument("--output", required=True, type=Path, help="新输出目录，写入新增标签.pdf、新增发货单.csv、去重报告.json")
     return root
 
 
@@ -193,7 +221,7 @@ def main(argv=None):
             stream.reconfigure(encoding="utf-8")
     args = parser().parse_args(argv)
     try:
-        return run(args)
+        return run_dedupe(args) if args.command == "dedupe" else run(args)
     except (OSError, ValueError, RuntimeError, csv.Error, PyPdfError) as exc:
         print(f"错误：{exc}", file=sys.stderr)
         return 1

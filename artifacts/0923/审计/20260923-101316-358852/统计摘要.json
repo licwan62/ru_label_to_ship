@@ -1,0 +1,57 @@
+{
+  "模式": "audit",
+  "状态": "审计通过",
+  "输入页数": 23,
+  "发货单行数": 23,
+  "信息表行数": 162,
+  "通过数": 23,
+  "待确认数": 0,
+  "跳过数": 0,
+  "验证问题数": 0,
+  "状态分布": {
+    "自动匹配通过": 23
+  },
+  "配送服务分布": {
+    "GUOO Economy Small": 6,
+    "GUOO Economy Budget": 17
+  },
+  "可分组统计": [
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 2
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 7
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 8
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 4
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 2
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0923\\新增标签.pdf": "9f81cbe6be70530a5321d515976a0ebcb32bcb9b6395059d72d0352eb08012cc",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0923\\新增发货单.csv": "a4ef38699e07d3e1989bd0905967854f77a6ef4e555e3a4defe0edc98c80dcc1",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0922\\Ozon上架链接汇总_两店对应完成(1).xlsx": "be4984806367e4814983aa750ce0693c99b43abc00b1d09221365f0f3d25cf9c",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0923\\manual_overrides.csv": "4f4b201222c3a20cdc97e8bd2903b430a5cdf079d4b59c29dfec4455cb97e293",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0923\\fuzzy_matches.json": "dff78f38e64053b1134ba98d2a8832f5a99081241243eeb1e50b6aea2a606a40"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0923\\审计\\20260923-101316-358852",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0923\\manual_overrides.csv",
+  "发货包目录": null,
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0923\\fuzzy_matches.json"
+}

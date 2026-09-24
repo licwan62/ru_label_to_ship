@@ -1,0 +1,74 @@
+{
+  "模式": "build",
+  "状态": "发货包已生成",
+  "输入页数": 33,
+  "发货单行数": 33,
+  "信息表行数": 162,
+  "通过数": 33,
+  "待确认数": 0,
+  "跳过数": 0,
+  "验证问题数": 0,
+  "状态分布": {
+    "自动匹配通过": 33
+  },
+  "配送服务分布": {
+    "GUOO Economy Small": 10,
+    "GUOO Economy Budget": 23
+  },
+  "可分组统计": [
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "2XXXL525",
+      "页数": 4
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "L",
+      "页数": 12
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "M",
+      "页数": 10
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "S",
+      "页数": 4
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "XLL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YL",
+      "页数": 1
+    },
+    {
+      "材质": "单层PEVA",
+      "发货尺码": "YXL",
+      "页数": 1
+    }
+  ],
+  "源文件SHA256": {
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0924\\标签发货9.24.pdf": "01a9eaf11e7928b0b55093d8703dd068a94ace28c2d7d68a2d7909cfe3559747",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0924\\发货对应9.24.pdf": "6b9a5bfd51be1b6a9a409ca9534ed49c8abcf8e90cd36f82c7f2b45582798e93",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\input\\0922\\Ozon上架链接汇总_两店对应完成(1).xlsx": "be4984806367e4814983aa750ce0693c99b43abc00b1d09221365f0f3d25cf9c",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\manual_overrides.csv": "17e1c830d416c96a0d6668ee0599a8d05585a1c77d5f9880cd76300080ed180d",
+    "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\fuzzy_matches.json": "21298e1ee5f20c89bc3e68adbf8decb29b66c13d27ebddcefe44e60f5551504f"
+  },
+  "源文件未改变": true,
+  "审计目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\审计\\20260924-151840-742070",
+  "人工覆盖表": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\manual_overrides.csv",
+  "发货包目录": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\output\\发货包",
+  "模糊匹配档案": "D:\\Licheng\\Repo\\ru_label_to_ship\\artifacts\\0924\\fuzzy_matches.json",
+  "输出复核": {
+    "复核页数": 33,
+    "明确跳过页数": 0,
+    "复核PDF数": 7,
+    "文字尺寸顺序复核": "通过",
+    "逐页144DPI像素复核": "通过"
+  }
+}

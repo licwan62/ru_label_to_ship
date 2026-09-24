@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pymupdf
 
-NUMBER_RE = re.compile(r"(?<![\w-])[0-9]+-[0-9]{4}-[0-9](?![\w-])")
+NUMBER_RE = re.compile(r"(?<![\w-])[0-9]+-[0-9]{4}-[0-9]+(?![\w-])")
 SERVICE_RE = re.compile(r"\bGUOO\s+(Economy\s+(?:Budget|Small)|Standard\s+Big)\b")
 
 

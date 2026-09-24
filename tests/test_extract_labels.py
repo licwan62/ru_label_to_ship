@@ -26,7 +26,8 @@ def test_bad_page_is_blocked(text, status):
 
 
 def test_full_identifier_boundaries_and_tail():
-    assert shipment_numbers("00123-0001-12 X00123-0001-1 00123-0001-1-X") == []
+    assert shipment_numbers("X00123-0001-1 00123-0001-1-X") == []
+    assert shipment_numbers("00123-0001-12") == ["00123-0001-12"]
     assert tail_four("40552532-0418-1") == "2532"
     assert tail_four("0000000009-0003-1") == "0009"
 

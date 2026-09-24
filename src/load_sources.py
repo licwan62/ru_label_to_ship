@@ -67,7 +67,7 @@ def load_shipments(path: Path):
 
 
 SHIPMENT_FIELDS = ["NO", "发货号码", "照片", "商品", "货号", "数量", "标签", "配送服务", "源记录号", "标准化信息"]
-SHIPMENT_NUMBER_RE = re.compile(r"\d+-\d{4}-\d")
+SHIPMENT_NUMBER_RE = re.compile(r"\d+-\d{4}-\d+")
 
 
 def load_shipments_pdf(path: Path):
